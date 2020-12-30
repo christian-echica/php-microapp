@@ -1,0 +1,60 @@
+version: "3.7"
+services:
+  # all containers should be place in my custom docker network "mydocker_ntw"
+  # this mysql-server we can create as many replicas we want - just make sure you assign the proper ports
+  # use docker inspect <networkid> for you to know the subnet - this case is 172.25.0.0/16 gw: 172.25.0.1
+  mysql-server:
+    build:
+      dockerfile: mysql.Dockerfile
+      context: .
+    command: --max_allowed_packet=67108864
+    restart: always
+    # scale: 2 - we can not use scale if we assign a static ip
+    volumes:
+      - ./usersdb.sql:/docker-entrypoint-initdb.d/usersdb.sql
+    networks:
+      mydocker_ntw:
+        ipv4_address: 172.25.0.20
+    ports:
+      - "3306:3306"
+  web-server-index:
+    build:
+      dockerfile: php.Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - mysql-server
+    networks:
+      - mydocker_ntw
+    ports:
+      - "8080:80"
+  web-server-office:
+    build:
+      dockerfile: php.Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - mysql-server
+    networks:
+      - mydocker_ntw
+    ports:
+      - "8081:80"
+  web-server-employees:
+    build:
+      dockerfile: php.Dockerfile
+      context: .
+    restart: always
+    depends_on:
+      - mysql-server
+    networks:
+      - mydocker_ntw
+    ports:
+      - "8082:80"
+
+networks:
+  mydocker_ntw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
