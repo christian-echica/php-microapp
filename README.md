@@ -18,4 +18,4 @@ To run:
 maintained by: Christian Echica
 # php-microapp
 
-![alt text](https://github.com/christian-echica/php-microapp/src/img/main/diagram.PNG?raw=true)
+![alt text](https://github.com/christian-echica/php-microapp/src/img/diagram.PNG?raw=true)
